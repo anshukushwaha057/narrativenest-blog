@@ -1,4 +1,4 @@
-import { Client, ID, Databases, Storage, Query } from "appwrite";
+import { Client, ID, Databases, Storage, Query, bucket } from "appwrite";
 import config from "../config/config";
 
 export class Service {
@@ -58,9 +58,9 @@ export class Service {
                 config.databaseId,
                 config.tableId,
                 slug
-                )
+            )
 
-                return true;
+            return true;
         } catch (error) {
             console.log("Appwrite Service :: deletePost :: error", error);
             return false;
@@ -74,11 +74,11 @@ export class Service {
                 config.tableId,
                 slug
             )
-            
+
         } catch (error) {
-                console.log("Appwrite Service :: getPosts :: error", error);    
-                return false;
-            
+            console.log("Appwrite Service :: getPosts :: error", error);
+            return false;
+
         }
     }
 
@@ -90,11 +90,52 @@ export class Service {
                 query
             )
         } catch (error) {
-                console.log("Appwrite Service :: getAllPosts :: error", error);     
+            console.log("Appwrite Service :: getAllPosts :: error", error);
         }
     }
 
-    
+    // other Sevices for file uploads
+
+    async uploadFile(file) {
+        try {
+            return await this.storage.createFile(
+                config.bucketId,
+                ID.unique(),
+                file
+            )
+        } catch (error) {
+            console.log("Appwrite Service :: uploadFile :: error", error);
+            return false;
+        }
+    }
+
+    async deleteFile(fileId) {
+        try {
+            await this.storage.deleteFile(
+                config.bucketId,
+                fileId
+            );
+            return true;
+        } catch (error) {
+            console.log("Appwrite Service :: deleteFile :: error", error);
+            return false;
+        }
+    }
+
+    getFilePreview(fileId) {
+        try {
+            return this.storage.getFilePreview(
+                config.bucketId,
+                fileId
+            )
+        } catch (error) {
+            console.log("Appwrite Service :: getFilePreview :: error", error);
+            return false;
+
+        }
+    }
+
+
 
 
 
