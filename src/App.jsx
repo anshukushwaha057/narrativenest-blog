@@ -36,13 +36,9 @@ function App() {
         <Header />
       </div>
 
-      {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 lg:p-8">
         {/* <Outlet /> */}
         <div className="max-w-7xl mx-auto">
-
-          {/* Your page content will come here */}
-
         </div>
       </main>
 
