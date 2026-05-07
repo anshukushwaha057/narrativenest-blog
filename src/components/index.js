@@ -5,6 +5,9 @@ import Container from "./Container/Container.jsx";
 import Logo from "./Logo.jsx";
 import LogoutBtn from "./Header/LogoutBtn.jsx";
 import Button from "./Button.jsx";
+import Input from "./Input.jsx"; 
+import Select from "./Select.jsx"; 
+import PostCard from "./PostCard.jsx";  
 
 export { 
     Footer, 
@@ -13,5 +16,8 @@ export {
     Container,
     Logo,
     LogoutBtn,
-    Button  
+    Button,
+    Input,  
+    Select,
+    PostCard    
 };
