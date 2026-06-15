@@ -7,7 +7,11 @@ import LogoutBtn from "./Header/LogoutBtn.jsx";
 import Button from "./Button.jsx";
 import Input from "./Input.jsx"; 
 import Select from "./Select.jsx"; 
-import PostCard from "./PostCard.jsx";  
+import PostCard from "./PostCard.jsx"; 
+import Login from "./Login.jsx";
+import Signup from "./Signup.jsx";
+import RTE from "./RTE/RTE.jsx";
+import PostForm from "./post-form/PostForm.jsx";
 
 export { 
     Footer, 
@@ -19,5 +23,9 @@ export {
     Button,
     Input,  
     Select,
-    PostCard    
+    PostCard,
+    Login,
+    Signup, 
+    RTE,    
+    PostForm
 };
