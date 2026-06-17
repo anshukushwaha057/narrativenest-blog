@@ -12,19 +12,25 @@ function Login() {
     const {register, handleSubmit} = useForm()
     const [error, setError] = useState("")
 
-    const login = async(data) => {
-        setError("")
-        try {
-            const session = await authService.login(data)
-            if (session) {
-                const userData = await authService.getCurrentUser()
-                if(userData) dispatch(authLogin(userData));
-                navigate("/")
+   const login = async(data) => {
+    setError("")
+    try {
+        const session = await authService.login(data)
+        if (session) {
+            const userData = await authService.getCurrentUser()
+            
+            if(userData) {
+                const cleanUserData = JSON.parse(JSON.stringify(userData));
+                
+                dispatch(authLogin(cleanUserData));
             }
-        } catch (error) {
-            setError(error.message)
+            
+            navigate("/")
         }
+    } catch (error) {
+        setError(error.message)
     }
+}
 
   return (
     <div

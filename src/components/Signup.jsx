@@ -1,35 +1,48 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import authService from '../appwrite/auth.js'
-import {Link ,useNavigate} from 'react-router-dom'
-import {login} from '../store/AuthSlice.js'
-import {Button, Input, Logo} from './index.js'
-import {useDispatch} from 'react-redux'
-import {useForm} from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import { login } from '../store/AuthSlice.js'
+import { Button, Input, Logo } from './index.js'
+import { useDispatch } from 'react-redux'
+import { useForm } from 'react-hook-form'
 
 function Signup() {
     const navigate = useNavigate()
     const [error, setError] = useState("")
+    const [isLoading, setIsLoading] = useState(false) // Added loading state
     const dispatch = useDispatch()
-    const {register, handleSubmit} = useForm()
+    
+    // Destructured errors from formState to display client-side validation errors
+    const { register, handleSubmit, formState: { errors } } = useForm()
 
-    const create = async(data) => {
+    const create = async (data) => {
         setError("")
+        setIsLoading(true)
         try {
-            const userData = await authService.createAccount(data)
-            if (userData) {
-                const userData = await authService.getCurrentUser()
-                if(userData) dispatch(login(userData));
+            const userAccount = await authService.createAccount(data)
+
+            if (userAccount) {
+                const currentUser = await authService.getCurrentUser()
+
+                if (currentUser) {
+                    // Smart fix for Redux Toolkit's non-serializable check
+                    const cleanCurrentUser = JSON.parse(JSON.stringify(currentUser));
+                    dispatch(login(cleanCurrentUser))
+                }
+
                 navigate("/")
             }
         } catch (error) {
             setError(error.message)
+        } finally {
+            setIsLoading(false) // Reset loading state regardless of success or failure
         }
     }
 
-  return (
-    <div className="flex items-center justify-center">
-            <div className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}>
-            <div className="mb-2 flex justify-center">
+    return (
+        <div className="flex items-center justify-center">
+            <div className="mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10">
+                <div className="mb-2 flex justify-center">
                     <span className="inline-block w-full max-w-[100px]">
                         <Logo width="100%" />
                     </span>
@@ -44,45 +57,59 @@ function Signup() {
                         Sign In
                     </Link>
                 </p>
+                
+                {/* Global API / Server Error */}
                 {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
 
-                <form onSubmit={handleSubmit(create)}>
+                <form onSubmit={handleSubmit(create)} className="mt-8">
                     <div className='space-y-5'>
-                        <Input
-                        label="Full Name: "
-                        placeholder="Enter your full name"
-                        {...register("name", {
-                            required: true,
-                        })}
-                        />
-                        <Input
-                        label="Email: "
-                        placeholder="Enter your email"
-                        type="email"
-                        {...register("email", {
-                            required: true,
-                            validate: {
-                                matchPatern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                                "Email address must be a valid address",
-                            }
-                        })}
-                        />
-                        <Input
-                        label="Password: "
-                        type="password"
-                        placeholder="Enter your password"
-                        {...register("password", {
-                            required: true,})}
-                        />
-                        <Button type="submit" className="w-full">
-                            Create Account
+                        {/* Full Name Input */}
+                        <div>
+                            <Input
+                                label="Full Name: "
+                                placeholder="Enter your full name"
+                                {...register("name", { required: "Full name is required" })}
+                            />
+                            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                        </div>
+
+                        {/* Email Input */}
+                        <div>
+                            <Input
+                                label="Email: "
+                                placeholder="Enter your email"
+                                type="email"
+                                {...register("email", {
+                                    required: "Email is required",
+                                    validate: {
+                                        matchPattern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
+                                        "Email address must be a valid address",
+                                    }
+                                })}
+                            />
+                            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                        </div>
+
+                        {/* Password Input */}
+                        <div>
+                            <Input
+                                label="Password: "
+                                type="password"
+                                placeholder="Enter your password"
+                                {...register("password", { required: "Password is required" })}
+                            />
+                            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+                        </div>
+
+                        {/* Disabled Button during submission prevents spamming */}
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading ? "Creating Account..." : "Create Account"}
                         </Button>
                     </div>
                 </form>
             </div>
-
-    </div>
-  )
+        </div>
+    )
 }
 
 export default Signup

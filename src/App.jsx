@@ -9,50 +9,45 @@ import { Outlet } from 'react-router-dom'
 function App() {
 
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-
   const dispatch = useDispatch()
 
   useEffect(() => {
-    const userData = authService.getCurrentUser()
+    authService.getCurrentUser()
       .then((userData) => {
         if (userData) {
-          dispatch(login({ userData }))
+          const cleanUserData = JSON.parse(JSON.stringify(userData));
+          dispatch(login(cleanUserData))
         } else {
           dispatch(logout())
         }
       })
+      .catch(() => {
+        dispatch(logout())
+      })
       .finally(() => {
         setLoading(false)
       })
-  }, [])
+  }, [dispatch])
 
-
-  return !loading ? (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
-
-      {/* Header */}
-      <div className="sticky top-0 z-50 shadow-md bg-gray-800">
-        <Header />
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-900">
+        <Loader />
       </div>
+    )
+  }
 
-      <main className="flex-1 p-4 md:p-6 lg:p-8">
-        {/* <Outlet /> */}
-        <div className="max-w-7xl mx-auto">
-        </div>
-      </main>
-
-      {/* Footer */}
-      <div className="bg-gray-800 border-t border-gray-700">
+  return (
+    <div className='min-h-screen flex flex-wrap content-between bg-gray-400'>
+      <div className='w-full block'>
+        <Header />
+        <main>
+          <Outlet />
+        </main>
         <Footer />
       </div>
-
     </div>
-  ) : (
-    <div className="flex items-center justify-center h-screen bg-gray-900">
-      <Loader />
-    </div>
-  );
+  )
 }
 
-export default App;
+export default App

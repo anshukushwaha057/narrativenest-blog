@@ -1,4 +1,4 @@
-import { Client, ID, Databases, Storage, Query, bucket } from "appwrite";
+import { Client, ID, Databases, Storage, Query } from "appwrite"; // bucket hataya hu
 import config from "../config/config";
 
 export class Service {
@@ -15,23 +15,23 @@ export class Service {
     }
 
     async createPost({ title, slug, content, featuredImage, status, userId }) {
-        try {
-            return await this.databases.createDocument(
-                config.databaseId,
-                config.tableId,
-                slug,
-                {
-                    title,
-                    content,
-                    featuredImage,
-                    status,
-                    userId
-                }
-            )
-        } catch (error) {
-            console.log("Appwrite Service :: createPost :: error", error);
-        }
+    try {
+        return await this.databases.createDocument(
+            config.databaseId,
+            config.tableId,
+            slug,
+            {
+                title,
+                content,
+                image: featuredImage, 
+                status,
+                userId
+            }
+        )
+    } catch (error) {
+        console.log("Appwrite Service :: createPost :: error", error);
     }
+}
 
     async updatePost(slug, { title, content, featuredImage, status }) {
         try {
@@ -67,20 +67,19 @@ export class Service {
         }
     }
 
-    async getPosts(slug) {
-        try {
-            return await this.databases.getDocument(
-                config.databaseId,
-                config.tableId,
-                slug
-            )
-
-        } catch (error) {
-            console.log("Appwrite Service :: getPosts :: error", error);
-            return false;
-
-        }
+    async getPosts(queries = [Query.equal("status", "active")]) {
+    try {
+        // Yahan listDocuments use hoga saare blogs fetch karne ke liye
+        return await this.databases.listDocuments(
+            config.databaseId,
+            config.tableId,
+            queries
+        )
+    } catch (error) {
+        console.log("Appwrite Service :: getPosts :: error", error);
+        return false;
     }
+}
 
     async getAllPosts(query = [Query.equal("status", "active")]) {
         try {

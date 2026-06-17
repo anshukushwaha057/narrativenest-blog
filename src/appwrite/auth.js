@@ -15,24 +15,31 @@ export class AuthService {
 
     async createAccount(email, password, name) {
         try {
-            const creatAccount = await this.account.create(ID.unique(), email, password, name);
-            if (creatAccount) {
-                // return default login
-                this.login(email, password);
-            } else {
-                return creatAccount;
+            const createdAccount = await this.account.create(
+                ID.unique(),
+                email,
+                password,
+                name
+            );
+
+            if (createdAccount) {
+                return await this.login(email, password);
             }
 
-        } catch (error) {
+            return null;
 
+        } catch (error) {
+            console.log("Appwrite createAccount error:", error);
+            throw error;
         }
     }
 
     async login(email, password) {
         try {
-            await this.account.createEmailSession(email, password);
+            return await this.account.createEmailPasswordSession(email, password);
         } catch (error) {
             console.log("Appwrite Service :: login :: error", error);
+            throw error;
         }
     }
 
